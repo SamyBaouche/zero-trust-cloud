@@ -1,0 +1,6 @@
+$kind: collection
+name: Zero Trust Cloud - Auth Service
+description: Collection for the Zero Trust Cloud Auth Service API running on port 8081.
+variables:
+  - key: base_url
+    value: 'http://localhost:8081'
