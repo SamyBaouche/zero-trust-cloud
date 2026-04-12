@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-zero-trust
+    environment:
+      POSTGRES_DB: zero_trust_cloud
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    restart: always
