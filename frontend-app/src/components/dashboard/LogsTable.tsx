@@ -7,8 +7,17 @@ interface LogsTableProps {
   compact?: boolean
 }
 
+/**
+ * LogsTable renders access logs in a simple HTML table.
+ * <p>
+ * Features:
+ * - Loading skeleton UI
+ * - Empty state
+ * - Optional compact mode to hide less important columns
+ */
 export default function LogsTable({ logs, loading, compact }: LogsTableProps) {
   if (loading) {
+    // Skeleton placeholder while data is loading.
     return (
       <div className="skeleton-block" aria-live="polite" aria-busy="true">
         <div className="skeleton-line" />
@@ -19,7 +28,8 @@ export default function LogsTable({ logs, loading, compact }: LogsTableProps) {
   }
 
   if (!logs.length) {
-    return <p className="muted">Aucun log disponible pour le moment.</p>
+    // Friendly message when there is no data yet.
+    return <p className="muted">No logs available yet.</p>
   }
 
   return (
@@ -31,6 +41,9 @@ export default function LogsTable({ logs, loading, compact }: LogsTableProps) {
             <th>Resource</th>
             <th>Action</th>
             <th>Decision</th>
+            <th>Risk</th>
+            <th>Reasons</th>
+            {/* Compact mode hides network/device columns to fit smaller panels. */}
             {!compact && <th>IP</th>}
             {!compact && <th>Location</th>}
             {!compact && <th>Device</th>}
@@ -46,6 +59,25 @@ export default function LogsTable({ logs, loading, compact }: LogsTableProps) {
               <td>
                 <DecisionBadge decision={log.decision} />
               </td>
+              <td>{log.riskScore ?? '-'}</td>
+              <td>
+                {log.reasons && log.reasons.length > 0 ? (
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {log.reasons.map((reason, i) => (
+                      <li key={i} style={{ fontSize: '0.95em' }}>
+                        {reason}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  '-'
+                )}
+                {log.message && (
+                  <div style={{ fontSize: '0.9em', color: '#888' }}>
+                    {log.message}
+                  </div>
+                )}
+              </td>
               {!compact && <td>{log.ipAddress}</td>}
               {!compact && <td>{log.location}</td>}
               {!compact && <td>{log.device}</td>}
@@ -57,5 +89,3 @@ export default function LogsTable({ logs, loading, compact }: LogsTableProps) {
     </div>
   )
 }
-
-

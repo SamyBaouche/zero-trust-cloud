@@ -12,16 +12,30 @@ import java.util.Date;
 import java.util.function.Function;
 
 /**
- * Service responsible for generating and validating JWT tokens.
+ * JwtService is responsible for generating and validating JWT (JSON Web Token) strings.
+ * <p>
+ * Beginner explanation:
+ * - A JWT is a signed token that proves a user is authenticated.
+ * - The backend creates it at login.
+ * - The frontend sends it with each request (Authorization: Bearer ...).
  */
 @Service
 public class JwtService {
 
-    // Secret key used to sign and verify JWT tokens
+    /**
+     * Secret key used to sign and verify JWT tokens.
+     * <p>
+     * In real production systems this should be stored in an environment variable / secret manager.
+     */
     private static final String SECRET_KEY = "my-super-secret-key-for-zero-trust-cloud-auth-12345";
 
     /**
-     * Generate a JWT token for a given user email.
+     * Generates a JWT token for a given user email.
+     * <p>
+     * Current behavior: token expires after 1 hour.
+     *
+     * @param email user email to store as the JWT subject
+     * @return signed JWT string
      */
     public String generateToken(String email) {
         return Jwts.builder()
@@ -33,7 +47,7 @@ public class JwtService {
     }
 
     /**
-     * Extract the email (subject) from a JWT token.
+     * Extracts the email (the JWT "subject") from a token.
      */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -48,7 +62,11 @@ public class JwtService {
     }
 
     /**
-     * Validate token against a user.
+     * Validates the token against a user.
+     * <p>
+     * We consider the token valid if:
+     * - the subject matches the provided {@link UserDetails}
+     * - the token is not expired
      */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);

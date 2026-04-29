@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO used to send authentication response back to the client.
- *
- * For now, it returns the JWT token after login.
+ * AuthResponse is a DTO (Data Transfer Object) returned after a successful authentication.
+ * <p>
+ * In this project, logging in returns a JWT token. The frontend stores this token and sends it
+ * in the "Authorization" header for subsequent requests.
  */
 @Getter
 @Setter
@@ -18,6 +19,8 @@ public class AuthResponse {
 
     /**
      * JWT token generated after successful authentication.
+     * <p>
+     * The client typically sends it as: {@code Authorization: Bearer <token>}.
      */
     private String token;
 }

@@ -9,40 +9,39 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * This service is used by Spring Security to load a user from the database.
- *
- * It converts your User entity into Spring Security's UserDetails object.
+ * CustomUserDetailsService is used by Spring Security to load a user from the database.
+ * <p>
+ * It converts our {@link User} entity into Spring Security's {@link UserDetails} object.
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    // Repository used to fetch users from the database
+    /** Repository used to fetch users from the database. */
     private final UserRepository userRepository;
 
-    /**
-     * Constructor injection
-     */
+    /** Constructor injection. */
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     /**
-     * Load a user by email.
+     * Loads a user by email.
+     * <p>
+     * Spring Security calls this method when it needs user details to authenticate a request.
      *
-     * Spring Security calls this method when it needs user details.
+     * @param email the email (username) to search
+     * @return a Spring Security {@link UserDetails} object
+     * @throws UsernameNotFoundException if no user exists for that email
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         // Find the user in the database by email
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        /**
-         * Convert your User entity into Spring Security's User object.
-         *
-         * For now, we give every user a basic role: ROLE_USER
-         */
+        // Convert our User entity into Spring Security's built-in UserDetails implementation.
+        // For now, every authenticated user receives a basic role: ROLE_USER.
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),

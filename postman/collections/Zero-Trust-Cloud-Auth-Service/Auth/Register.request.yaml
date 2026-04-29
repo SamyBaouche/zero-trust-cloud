@@ -11,5 +11,14 @@ body:
   content: |-
     {
       "email": "user@example.com",
-      "password": "yourpassword"
+      "password": "yourpassword",
+      "firstName": "John",
+      "lastName": "Doe",
+      "dateOfBirth": "1996-08-25",
+      "company": "Acme Cloud",
+      "jobTitle": "Security Engineer",
+      "country": "France",
+      "phone": "+33 6 00 00 00 00",
+      "department": "Blue Team",
+      "securityClearance": "Internal"
     }

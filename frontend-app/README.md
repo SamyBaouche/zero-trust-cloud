@@ -43,3 +43,38 @@ Base URL API: `http://localhost:8081`
 - `src/services` : API Axios et services metier
 - `src/types` : contrats TypeScript
 - `src/router` : routing central et routes protegees
+
+## Code Tour (Junior-Friendly)
+
+This frontend follows a simple layered structure:
+
+- **Pages** (`src/pages`): full screens tied to a route (`/login`, `/dashboard`, ...).
+- **Components** (`src/components`): reusable UI building blocks (tables, layouts, toggles).
+- **Context** (`src/context`): global state (auth token, theme, language).
+- **Services** (`src/services`): API calls to the backend (Axios + small helper functions).
+- **Types** (`src/types`): TypeScript interfaces matching backend JSON contracts.
+
+### Key flows
+
+- **Login flow**
+  1. `LoginPage` calls `useAuth().login(...)`
+  2. `AuthContext` calls `loginRequest()` (`POST /auth/login`)
+  3. Token is stored via `storage.ts` (localStorage)
+  4. `apiClient` attaches the token on subsequent requests
+
+- **Unauthorized (401) flow**
+  1. Backend returns 401
+  2. `apiClient` removes the token and dispatches `auth:unauthorized`
+  3. `AuthContext` listens to that event and logs out
+  4. Protected routes redirect back to `/login`
+
+### Documentation style
+
+The code uses short, beginner-friendly **English JSDoc** comments to explain:
+
+- what a module/component does
+- why a piece of logic exists (more important than describing obvious syntax)
+- which backend endpoint a service function calls
+
+Tip: start reading from `src/main.tsx` (providers) then `src/router/AppRouter.tsx` (routes).
+

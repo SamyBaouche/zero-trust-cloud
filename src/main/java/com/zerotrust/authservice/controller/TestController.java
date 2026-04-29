@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller used for testing public and protected endpoints.
+ * <p>
+ * These endpoints are mainly used during development to confirm that routing and JWT protection work.
  */
 @RestController
 public class TestController {
@@ -19,6 +21,7 @@ public class TestController {
 
     /**
      * Protected endpoint.
+     * <p>
      * Requires a valid JWT token.
      */
     @GetMapping("/test/secure")

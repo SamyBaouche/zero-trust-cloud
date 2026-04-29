@@ -1,6 +1,10 @@
 import { Link, Outlet } from 'react-router-dom'
-import ThemeToggle from '../common/ThemeToggle'
 
+/**
+ * PublicLayout is the wrapper for public pages (landing/login/register).
+ * <p>
+ * It renders a lightweight header and an <Outlet /> where the current route is displayed.
+ */
 export default function PublicLayout() {
   return (
     <div className="public-shell">
@@ -9,7 +13,7 @@ export default function PublicLayout() {
           Zero Trust Cloud
         </Link>
         <nav>
-          <ThemeToggle />
+          {/* Simple navigation for public routes. */}
           <Link to="/login" className="ghost-button">
             Login
           </Link>

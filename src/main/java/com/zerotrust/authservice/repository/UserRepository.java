@@ -1,45 +1,33 @@
 package com.zerotrust.authservice.repository;
 
-// Import the User entity (mapped to the database table)
 import com.zerotrust.authservice.model.User;
-
-// Spring Data JPA interface that provides built-in database operations
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
 
 /**
- * Repository interface for User entity.
- *
- * This interface allows you to interact with the database
- * without writing SQL queries manually.
- *
- * Spring automatically implements this at runtime.
+ * UserRepository is the Spring Data JPA repository for {@link User}.
+ * <p>
+ * It lets the service layer load and store users without writing SQL manually.
+ * Spring generates the implementation automatically at runtime.
  */
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    /**
-     * Find a user by email
-     *
-     * Example:
-     * SELECT * FROM users WHERE email = ?
-     *
-     * Optional<User> means:
-     * - user may exist
-     * - or may not exist (null-safe)
-     */
+    /** Finds a user by an exact (case-sensitive) email match. */
     Optional<User> findByEmail(String email);
 
     /**
-     * Check if a user already exists by email
-     *
-     * Example:
-     * SELECT COUNT(*) > 0 FROM users WHERE email = ?
-     *
-     * Returns:
-     * - true → email already exists
-     * - false → email available
+     * Finds a user by email, ignoring case.
+     * <p>
+     * Returns an {@link Optional} so callers can handle "user not found" safely.
      */
-    boolean existsByEmail(String email);
+    Optional<User> findByEmailIgnoreCase(String email);
+
+    /**
+     * Checks if a user already exists for the given email (case-insensitive).
+     * <p>
+     * Useful for validation during registration or email updates.
+     */
+    boolean existsByEmailIgnoreCase(String email);
 }

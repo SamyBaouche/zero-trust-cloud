@@ -1,24 +1,42 @@
 import { useEffect, useMemo, useState } from 'react'
 import LogsTable from '../components/dashboard/LogsTable'
 import { fetchLogs } from '../services/logService'
+import { useAuth } from '../context/AuthContext'
 import type { AccessDecision, AccessLog } from '../types/access'
 
+/**
+ * LogsPage shows the user's audit logs.
+ * <p>
+ * The backend returns logs, and the frontend filters them by the current user email.
+ * We also provide a simple decision filter (ALLOW/CHALLENGE/DENY).
+ */
 export default function LogsPage() {
+  const { userEmail } = useAuth()
+  const normalizedUserEmail = userEmail?.trim().toLowerCase() ?? null
   const [logs, setLogs] = useState<AccessLog[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [decisionFilter, setDecisionFilter] = useState<AccessDecision | 'ALL'>('ALL')
 
   useEffect(() => {
+    if (!normalizedUserEmail) {
+      setLogs([])
+      setLoading(false)
+      setError(null)
+      return
+    }
+
     const loadLogs = async () => {
       setLoading(true)
       setError(null)
 
       try {
         const data = await fetchLogs()
-        setLogs(data)
+        setLogs(
+          data.filter((log) => (log.userEmail ?? '').trim().toLowerCase() === normalizedUserEmail),
+        )
       } catch {
-        setError('Impossible de recuperer les logs.')
+        setError('Unable to fetch logs.')
         setLogs([])
       } finally {
         setLoading(false)
@@ -26,13 +44,14 @@ export default function LogsPage() {
     }
 
     void loadLogs()
-  }, [])
+  }, [normalizedUserEmail])
 
   const filteredLogs = useMemo(() => {
     if (decisionFilter === 'ALL') {
       return logs
     }
 
+    // Normalize to uppercase to match our AccessDecision values.
     return logs.filter((log) => log.decision.toUpperCase() === decisionFilter)
   }, [decisionFilter, logs])
 
