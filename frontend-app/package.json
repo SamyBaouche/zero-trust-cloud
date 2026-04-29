@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "parcel index.html",
     "build": "parcel build index.html",
+    "start": "parcel index.html",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
@@ -13,7 +14,8 @@
     "axios": "^1.13.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router-dom": "6.28.2"
+    "react-router-dom": "6.28.2",
+    "parcel": "^2.16.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
@@ -24,7 +26,6 @@
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.4.0",
-    "parcel": "^2.16.1",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0"
   }
