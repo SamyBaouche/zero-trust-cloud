@@ -4,11 +4,9 @@ import { getToken, removeToken } from './storage'
 /**
  * Base URL of the backend API.
  * <p>
- * Uses VITE_API_URL when provided (Parcel reads process.env from .env files).
- * Falls back to the deployed AWS backend to avoid localhost dependencies.
+ * Defined through Vite environment variables.
  */
-const API_BASE_URL = (process.env.VITE_API_URL
-  ?? 'http://zerotrustcloud-env.eba-qsx75p3h.us-east-2.elasticbeanstalk.com').replace(/\/+$/, '')
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 /**
  * Shared Axios instance used by all frontend services.
