@@ -28,7 +28,12 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 // Apply CORS rules to every API endpoint.
                 registry.addMapping("/**")
-                        .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*")
+                        .allowedOriginPatterns(
+                                "http://localhost:*",
+                                "http://127.0.0.1:*",
+                                "https://zero-trust-cloud.vercel.app",
+                                "https://*.vercel.app"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

@@ -6,7 +6,8 @@ import { getToken, removeToken } from './storage'
  * <p>
  * Defined through Vite environment variables.
  */
-const API_BASE_URL = import.meta.env.VITE_API_URL
+const API_URL =
+  import.meta.env?.VITE_API_URL || 'https://zero-trust-cloud.onrender.com'
 
 /**
  * Shared Axios instance used by all frontend services.
@@ -14,7 +15,10 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
  * It automatically attaches the JWT token on non-auth endpoints and reacts to 401 errors.
  */
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
   timeout: 12000,
 })
 
