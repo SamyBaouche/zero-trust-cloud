@@ -20,19 +20,19 @@ injectSpeedInsights()
  * can access them via custom hooks.
  */
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    {/* ThemeProvider: controls dark/light mode and persists the choice. */}
-    <ThemeProvider>
-      {/* LanguageProvider: simple i18n helper + persistence in localStorage. */}
-      <LanguageProvider>
-        {/* AuthProvider: stores JWT token and exposes login/logout helpers. */}
-        <AuthProvider>
-          {/* BrowserRouter: enables client-side routing (/login, /dashboard, etc.). */}
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  </StrictMode>,
+    <StrictMode>
+        {/* ThemeProvider: controls dark/light mode and persists the choice. */}
+        <ThemeProvider>
+            {/* LanguageProvider: simple i18n helper + persistence in localStorage. */}
+            <LanguageProvider>
+                {/* AuthProvider: stores JWT token and exposes login/logout helpers. */}
+                <AuthProvider>
+                    {/* BrowserRouter: enables client-side routing (/login, /dashboard, etc.). */}
+                    <BrowserRouter>
+                        <App />
+                    </BrowserRouter>
+                </AuthProvider>
+            </LanguageProvider>
+        </ThemeProvider>
+    </StrictMode>,
 )
