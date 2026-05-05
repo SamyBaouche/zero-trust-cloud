@@ -10,7 +10,15 @@ import type { AuthResponse, LoginRequest, RegisterRequest } from '../types/auth'
  * @returns JWT token wrapper
  */
 export async function loginRequest(payload: LoginRequest): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>('/auth/login', payload)
+  const requestBody: LoginRequest = {
+    email: payload.email.trim(),
+    password: payload.password,
+  }
+
+  // Debug contract sent to backend for login mismatch issues.
+  console.info('POST auth/login payload', requestBody)
+
+  const { data } = await apiClient.post<AuthResponse>('auth/login', requestBody)
   return data
 }
 
@@ -23,7 +31,7 @@ export async function loginRequest(payload: LoginRequest): Promise<AuthResponse>
  * @returns a plain success message string
  */
 export async function registerRequest(payload: RegisterRequest): Promise<string> {
-  const { data } = await apiClient.post<string>('/auth/register', payload)
+  const { data } = await apiClient.post<string>('auth/register', payload)
   return data
 }
 

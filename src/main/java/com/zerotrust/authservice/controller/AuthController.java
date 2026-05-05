@@ -4,6 +4,8 @@ import com.zerotrust.authservice.dto.AuthResponse;
 import com.zerotrust.authservice.dto.LoginRequest;
 import com.zerotrust.authservice.dto.RegisterRequest;
 import com.zerotrust.authservice.service.AuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthService authService;
 
@@ -55,6 +59,17 @@ public class AuthController {
      */
     @PostMapping("/login")
     public AuthResponse login(@RequestBody LoginRequest request) {
+        log.info("POST /auth/login payload received: email={}, passwordLength={}",
+                request.getEmail(),
+                request.getPassword() == null ? 0 : request.getPassword().length());
+
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email is required");
+        }
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "password is required");
+        }
+
         try {
             return authService.login(request);
         } catch (RuntimeException exception) {

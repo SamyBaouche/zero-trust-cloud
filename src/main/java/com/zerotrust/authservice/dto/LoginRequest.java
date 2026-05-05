@@ -1,5 +1,6 @@
 package com.zerotrust.authservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class LoginRequest {
      * User email sent by the client.
      * Example: "john.doe@example.com".
      */
+    @JsonAlias({"username"})
     private String email;
 
     /**
