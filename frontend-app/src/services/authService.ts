@@ -11,7 +11,7 @@ import type { AuthResponse, LoginRequest, RegisterRequest } from '../types/auth'
  */
 export async function loginRequest(payload: LoginRequest): Promise<AuthResponse> {
   const requestBody: LoginRequest = {
-    email: payload.email.trim(),
+    email: payload.email.trim().toLowerCase(),
     password: payload.password,
   }
 

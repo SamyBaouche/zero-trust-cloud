@@ -95,6 +95,9 @@ public class AuthController {
         if (message.contains("Invalid email or password")) {
             return new ResponseStatusException(HttpStatus.UNAUTHORIZED, message, exception);
         }
+        if (message.contains("Stored password format invalid")) {
+            return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message, exception);
+        }
 
         return new ResponseStatusException(HttpStatus.BAD_REQUEST, message, exception);
     }

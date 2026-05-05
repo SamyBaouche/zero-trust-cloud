@@ -3,6 +3,7 @@ package com.zerotrust.authservice.config;
 import com.zerotrust.authservice.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,14 +33,13 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
-
-                // ✅ MODIFIÉ ICI
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/health/**").permitAll()
                         .requestMatchers("/test").permitAll()
-                        .requestMatchers("/context/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
 
                 .sessionManagement(session -> session
@@ -49,8 +49,6 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
 
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-
-                // ✅ MODIFIÉ ICI
                 .httpBasic(httpBasic -> httpBasic.disable());
 
         return http.build();

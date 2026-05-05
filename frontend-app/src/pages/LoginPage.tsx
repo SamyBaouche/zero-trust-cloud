@@ -41,13 +41,25 @@ export default function LoginPage() {
       navigate(fromPath, { replace: true })
     } catch (err) {
       if (axios.isAxiosError(err)) {
+        console.error('Login failed', {
+          status: err.response?.status,
+          data: err.response?.data,
+          url: err.config?.url,
+        })
+
         // Try to extract a backend-provided error message.
+        const responseData = err.response?.data as
+          | string
+          | { message?: string; detail?: string; error?: string }
+          | undefined
+
         const apiMessage =
-          typeof err.response?.data === 'string'
-            ? err.response.data
-            : (err.response?.data as { message?: string } | undefined)?.message
+          typeof responseData === 'string'
+            ? responseData
+            : responseData?.message || responseData?.detail || responseData?.error
         setError(apiMessage || 'Invalid login. Please check your credentials.')
       } else {
+        console.error('Unexpected login error', err)
         setError('Invalid login. Please check your credentials.')
       }
     } finally {

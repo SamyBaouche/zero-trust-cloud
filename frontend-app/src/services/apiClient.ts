@@ -31,7 +31,8 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = getToken()
   const requestUrl = config.url ?? ''
-  const isAuthEndpoint = requestUrl.startsWith('/auth/')
+  const normalizedUrl = requestUrl.replace(/^\/+/, '')
+  const isAuthEndpoint = normalizedUrl.startsWith('auth/')
 
   if (token && !isAuthEndpoint) {
     config.headers.Authorization = `Bearer ${token}`

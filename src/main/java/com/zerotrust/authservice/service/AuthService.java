@@ -5,6 +5,8 @@ import com.zerotrust.authservice.dto.LoginRequest;
 import com.zerotrust.authservice.dto.RegisterRequest;
 import com.zerotrust.authservice.model.User;
 import com.zerotrust.authservice.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,8 @@ import java.util.regex.Pattern;
  */
 @Service
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[+0-9()\\-\\s]{8,20}$");
@@ -115,20 +119,35 @@ public class AuthService {
      * @throws RuntimeException if credentials are invalid
      */
     public AuthResponse login(LoginRequest request) {
-        String email = normalize(request.getEmail());
+        String normalizedEmail = normalize(request.getEmail());
+        final String email = normalizedEmail == null ? null : normalizedEmail.toLowerCase();
         String password = request.getPassword() == null ? "" : request.getPassword();
 
+        log.info("Login attempt received for email={}", maskEmail(email));
+
         if (isBlank(email) || isBlank(password)) {
+            log.warn("Login rejected: missing email or password. emailPresent={}, passwordPresent={}",
+                    !isBlank(email), !isBlank(password));
             throw new RuntimeException("Invalid email or password");
         }
 
         User user = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() -> {
+                    log.warn("Login rejected: user not found for email={}", maskEmail(email));
+                    return new RuntimeException("Invalid email or password");
+                });
+
+        if (!isBcryptHash(user.getPassword())) {
+            log.error("Login blocked: stored password is not BCrypt for user email={}", maskEmail(user.getEmail()));
+            throw new RuntimeException("Stored password format invalid. Reset password required");
+        }
 
         boolean passwordMatches = passwordEncoder.matches(
                 password,
                 user.getPassword()
         );
+
+        log.info("Login password check for email={} => matched={}", maskEmail(user.getEmail()), passwordMatches);
 
         if (!passwordMatches) {
             throw new RuntimeException("Invalid email or password");
@@ -173,6 +192,26 @@ public class AuthService {
             throw new RuntimeException("Phone format is invalid");
         }
         return normalized;
+    }
+
+    private boolean isBcryptHash(String value) {
+        return value != null && value.matches("^\\$2[aby]\\$.{56}$");
+    }
+
+    private String maskEmail(String email) {
+        if (email == null || email.isBlank() || !email.contains("@")) {
+            return "<empty>";
+        }
+
+        String[] parts = email.split("@", 2);
+        String local = parts[0];
+        String domain = parts[1];
+
+        if (local.length() <= 2) {
+            return "**@" + domain;
+        }
+
+        return local.substring(0, 2) + "***@" + domain;
     }
 
 }
