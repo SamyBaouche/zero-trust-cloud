@@ -1,12 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { Analytics } from '@vercel/analytics/react'
+import { inject } from '@vercel/analytics'
 import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { LanguageProvider } from './context/LanguageContext.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
 import './styles/global.css'
+
+inject()
 
 /**
  * Frontend entry point.
@@ -26,7 +28,6 @@ createRoot(document.getElementById('root')!).render(
           {/* BrowserRouter: enables client-side routing (/login, /dashboard, etc.). */}
           <BrowserRouter>
             <App />
-            <Analytics />
           </BrowserRouter>
         </AuthProvider>
       </LanguageProvider>
