@@ -32,6 +32,18 @@ export default function LandingPage() {
         'Authenticate users using JWT and protect access to sensitive operations.',
       icon: 'JWT',
     },
+    {
+      title: 'Profile & Account Settings',
+      description:
+        'Users can manage profile data, update account information, and control their security context in one place.',
+      icon: 'PF',
+    },
+    {
+      title: 'Attack Simulator',
+      description:
+        'Run predefined attack scenarios to visualize risk outcomes and validate policy behavior quickly.',
+      icon: 'SIM',
+    },
   ]
 
   const steps = [
@@ -47,6 +59,10 @@ export default function LandingPage() {
       title: 'Access Decision',
       description: 'The system returns ALLOW, CHALLENGE, or DENY based on calculated risk.',
     },
+    {
+      title: 'Actionable Dashboard',
+      description: 'Explore alerts and cloud policies with filters and quick insights for faster investigations.',
+    },
   ]
 
   return (
@@ -56,8 +72,8 @@ export default function LandingPage() {
         <h1 className="landing-title">Zero Trust Cloud</h1>
         <p className="landing-subtitle">Secure access. Smart decisions. Full visibility.</p>
         <p className="landing-description">
-          A modern cloud security platform implementing Zero Trust principles with real-time
-          risk-based access evaluation.
+          A cloud-native Zero Trust platform with contextual authentication, risk-based decisions,
+          profile management, an attack simulator, and an interactive security dashboard.
         </p>
         <div className="landing-actions">
           <Link to="/register" className="primary-button">
@@ -89,7 +105,7 @@ export default function LandingPage() {
         <div className="landing-steps">
           {steps.map((step, index) => (
             <article className="landing-step card-dark" key={step.title}>
-              <span className="step-number">0{index + 1}</span>
+              <span className="step-number">{String(index + 1).padStart(2, '0')}</span>
               <h3>{step.title}</h3>
               <p>{step.description}</p>
             </article>
@@ -98,7 +114,7 @@ export default function LandingPage() {
       </section>
 
       <section className="landing-cta card-dark">
-        <h2>Start securing your cloud environment today.</h2>
+        <h2>Start securing your cloud environment with Zero Trust Cloud.</h2>
         <Link to="/register" className="primary-button">
           Create Account
         </Link>

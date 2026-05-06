@@ -6,10 +6,8 @@ import { useAuth } from '../context/AuthContext'
 import { submitAccessCheck } from '../services/accessService'
 import { fetchLogs } from '../services/logService'
 import { fetchPolicies } from '../services/policyService'
-import { fetchAlerts } from '../services/alertService'
 import type { AccessCheckRequest, AccessCheckResponse, AccessLog } from '../types/access'
 import type { Policy } from '../types/policy'
-import type { SecurityAlert } from '../types/alert'
 import type { UserProfile } from '../types/auth'
 
 /**
@@ -23,6 +21,10 @@ import type { UserProfile } from '../types/auth'
  * - active policies (/policies)
  */
 
+/**
+ * Static resource options used by the Access Check form.
+ * These labels mirror common cloud targets used in the demo.
+ */
 const CLOUD_RESOURCES = [
   'PUBLIC_DOCS',
   'INTERNAL_API',
@@ -33,6 +35,9 @@ const CLOUD_RESOURCES = [
   'KUBERNETES_CLUSTER',
   'SECRETS_MANAGER',
 ]
+/**
+ * Static action options used by the Access Check form.
+ */
 const CLOUD_ACTIONS = [
   'READ',
   'WRITE',
@@ -42,6 +47,9 @@ const CLOUD_ACTIONS = [
   'DOWNLOAD_SECRET',
 ]
 
+/**
+ * Initial form values so the access form is always controlled.
+ */
 const defaultPayload: AccessCheckRequest = {
   resource: 's3://finance-reports',
   action: 'read',
@@ -52,16 +60,28 @@ const defaultPayload: AccessCheckRequest = {
 
 export default function DashboardPage() {
   const { userEmail } = useAuth()
+
+  // Access-check form and latest decision state.
   const [formData, setFormData] = useState<AccessCheckRequest>(defaultPayload)
   const [latestDecision, setLatestDecision] = useState<AccessCheckResponse | null>(null)
   const [requestLoading, setRequestLoading] = useState(false)
+
+  // Logs panel state.
   const [logsLoading, setLogsLoading] = useState(false)
   const [logsError, setLogsError] = useState<string | null>(null)
   const [logs, setLogs] = useState<AccessLog[]>([])
+
+  // Policies and client-side filters.
   const [policies, setPolicies] = useState<Policy[]>([])
-  const [alerts, setAlerts] = useState<SecurityAlert[]>([])
+  const [riskFilter, setRiskFilter] = useState<'ALL' | 'HIGH' | 'MEDIUM' | 'LOW'>('ALL')
+  const [policySearch, setPolicySearch] = useState('')
+  const [policyDecisionFilter, setPolicyDecisionFilter] = useState('ALL')
+
+  // User profile panel state.
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [profileError, setProfileError] = useState<string | null>(null)
+
+  // Normalize email once so all comparisons are case-insensitive.
   const normalizedUserEmail = userEmail?.trim().toLowerCase() ?? null
 
   /** Reloads logs from the backend and filters them for the current user. */
@@ -88,23 +108,6 @@ export default function DashboardPage() {
     }
   }
 
-  /** Reloads alerts from the backend and filters them for the current user. */
-  const refreshAlerts = async () => {
-    if (!normalizedUserEmail) {
-      setAlerts([])
-      return
-    }
-
-    try {
-      const data = await fetchAlerts()
-      setAlerts(
-        data.filter((alert) => (alert.userEmail ?? '').trim().toLowerCase() === normalizedUserEmail),
-      )
-    } catch {
-      setAlerts([])
-    }
-  }
-
   /** Reloads the profile information for the authenticated user. */
   const refreshProfile = async () => {
     try {
@@ -117,8 +120,11 @@ export default function DashboardPage() {
     }
   }
 
+  /**
+   * Load policy catalog once on first render.
+   * Policies are global rules, not tied to a specific user session.
+   */
   useEffect(() => {
-    // Policies are not user-specific, so we load them once.
     fetchPolicies().then(setPolicies).catch(() => setPolicies([]))
   }, [])
 
@@ -128,7 +134,6 @@ export default function DashboardPage() {
     // When auth state changes, refresh all user-tied panels.
     if (!userEmail) {
       setLogs([])
-      setAlerts([])
       setLatestDecision(null)
       setLogsError(null)
       setProfile(null)
@@ -136,11 +141,13 @@ export default function DashboardPage() {
       return
     }
     void refreshLogs()
-    void refreshAlerts()
     void refreshProfile()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userEmail])
 
+  /**
+   * Compute top-level log counters displayed in Security Overview.
+   */
   const stats = useMemo(() => {
     const base = { total: logs.length, allow: 0, challenge: 0, deny: 0 }
 
@@ -154,13 +161,76 @@ export default function DashboardPage() {
     return base
   }, [logs])
 
+  /**
+   * Build a short, newest-first activity feed for quick visibility.
+   */
   const recentActivity = useMemo(() => {
     return [...logs]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 4)
   }, [logs])
 
+  /**
+   * Apply risk filter to logs.
+   * If backend does not provide riskScore, we infer a fallback score from decision.
+   */
+  const filteredRiskLogs = useMemo(() => {
+    const resolveRiskScore = (log: AccessLog) => {
+      if (typeof log.riskScore === 'number') return log.riskScore
+      if (log.decision.toUpperCase() === 'DENY') return 85
+      if (log.decision.toUpperCase() === 'CHALLENGE') return 60
+      return 25
+    }
+
+    return [...logs]
+      .filter((log) => {
+        const risk = resolveRiskScore(log)
+        if (riskFilter === 'ALL') return true
+        if (riskFilter === 'HIGH') return risk >= 80
+        if (riskFilter === 'MEDIUM') return risk >= 50 && risk < 80
+        return risk < 50
+      })
+      .sort((a, b) => resolveRiskScore(b) - resolveRiskScore(a))
+  }, [logs, riskFilter])
+
+  /**
+   * Aggregate filtered risk logs by resource to highlight hot targets.
+   */
+  const topRiskResources = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const log of filteredRiskLogs) {
+      counts.set(log.resource, (counts.get(log.resource) ?? 0) + 1)
+    }
+
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+  }, [filteredRiskLogs])
+
+  /**
+   * Apply decision filter + text search over active policies.
+   */
+  const filteredPolicies = useMemo(() => {
+    const query = policySearch.trim().toLowerCase()
+
+    return policies.filter((policy) => {
+      const matchesDecision =
+        policyDecisionFilter === 'ALL' || policy.decision.toUpperCase() === policyDecisionFilter.toUpperCase()
+
+      const matchesSearch =
+        !query ||
+        policy.resource.toLowerCase().includes(query) ||
+        policy.action.toLowerCase().includes(query) ||
+        (policy.condition ?? '').toLowerCase().includes(query)
+
+      return matchesDecision && matchesSearch
+    })
+  }, [policies, policySearch, policyDecisionFilter])
+
+  /** Returns a display-safe value for optional profile fields. */
   const displayValue = (value?: string | null) => (value && value.trim() ? value : '-')
+
+  /** Formats an optional date string using browser locale, with safe fallback. */
   const displayDate = (value?: string | null) => {
     if (!value) {
       return '-'
@@ -170,6 +240,7 @@ export default function DashboardPage() {
     return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString()
   }
 
+  // Derived profile labels for avatar and heading.
   const profileName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ')
   const avatarLabel = profileName
     ? profileName
@@ -180,6 +251,9 @@ export default function DashboardPage() {
         .toUpperCase()
     : 'ZT'
 
+  /**
+   * Submit access check request and refresh logs so the new event appears immediately.
+   */
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setRequestLoading(true)
@@ -201,6 +275,9 @@ export default function DashboardPage() {
     }
   }
 
+  /**
+   * Prefill context fields (IP/device/location) using backend and browser context.
+   */
   const handleUseCurrentContext = async () => {
     try {
       // Ask the backend for our "real" IP + device info.
@@ -381,25 +458,64 @@ export default function DashboardPage() {
       </section>
 
       <section className="glass-card panel">
-        <h2>Security Alerts</h2>
-        {alerts.length === 0 && <p className="muted">No alerts or alerts endpoint unavailable.</p>}
+        <h2>Risk Insights</h2>
+        <div className="settings-actions">
+          <button type="button" className="ghost-button" onClick={() => setRiskFilter('ALL')}>
+            All
+          </button>
+          <button type="button" className="ghost-button" onClick={() => setRiskFilter('HIGH')}>
+            High risk
+          </button>
+          <button type="button" className="ghost-button" onClick={() => setRiskFilter('MEDIUM')}>
+            Medium risk
+          </button>
+          <button type="button" className="ghost-button" onClick={() => setRiskFilter('LOW')}>
+            Low risk
+          </button>
+        </div>
+        {filteredRiskLogs.length === 0 && <p className="muted">No risky activity for this filter.</p>}
         <div className="alerts-list">
-          {alerts.map((alert) => (
-            <article key={alert.id} className={`alert-card alert-${alert.type.toLowerCase()}`}>
-              <strong>{alert.type.replace(/_/g, ' ')}</strong>
-              <span>{alert.message}</span>
+          {filteredRiskLogs.slice(0, 6).map((log, index) => (
+            <article key={`${log.createdAt}-${index}`} className={`alert-card alert-${log.decision.toLowerCase()}`}>
+              <strong>{log.decision} decision</strong>
+              <span>
+                {log.action} on {log.resource}
+              </span>
               <div className="muted" style={{ fontSize: '0.95em' }}>
-                {alert.resource} {alert.action && `(${alert.action})`}
-                <br />
-                Risk: {alert.riskScore} | {new Date(alert.createdAt).toLocaleString()}
+                {new Date(log.createdAt).toLocaleString()}
               </div>
             </article>
           ))}
         </div>
+        {topRiskResources.length > 0 && (
+          <div className="decision-card">
+            <strong>Top targeted resources</strong>
+            <ul className="risk-breakdown">
+              {topRiskResources.map(([resource, count]) => (
+                <li key={resource}>
+                  {resource}: {count} event{count > 1 ? 's' : ''}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
       <section className="glass-card panel">
         <h2>Active Cloud Policies</h2>
-        {policies.length === 0 && <p className="muted">No policies or policies endpoint unavailable.</p>}
+        <div className="settings-actions policy-filters">
+          <input
+            value={policySearch}
+            onChange={(event) => setPolicySearch(event.target.value)}
+            placeholder="Search resource, action, condition"
+          />
+          <select value={policyDecisionFilter} onChange={(event) => setPolicyDecisionFilter(event.target.value)}>
+            <option value="ALL">All decisions</option>
+            <option value="ALLOW">ALLOW</option>
+            <option value="CHALLENGE">CHALLENGE</option>
+            <option value="DENY">DENY</option>
+          </select>
+        </div>
+        {filteredPolicies.length === 0 && <p className="muted">No policies for this filter.</p>}
         <table className="policies-table">
           <thead>
             <tr>
@@ -411,7 +527,7 @@ export default function DashboardPage() {
             </tr>
           </thead>
           <tbody>
-            {policies.map((policy) => (
+            {filteredPolicies.map((policy) => (
               <tr key={policy.id}>
                 <td>{policy.resource}</td>
                 <td>{policy.action}</td>

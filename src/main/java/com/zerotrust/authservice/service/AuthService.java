@@ -137,15 +137,22 @@ public class AuthService {
                     return new RuntimeException("Invalid email or password");
                 });
 
-        if (!isBcryptHash(user.getPassword())) {
-            log.error("Login blocked: stored password is not BCrypt for user email={}", maskEmail(user.getEmail()));
-            throw new RuntimeException("Stored password format invalid. Reset password required");
-        }
+        String storedPassword = user.getPassword();
+        boolean passwordMatches;
 
-        boolean passwordMatches = passwordEncoder.matches(
-                password,
-                user.getPassword()
-        );
+        if (isBcryptHash(storedPassword)) {
+            passwordMatches = passwordEncoder.matches(password, storedPassword);
+        } else {
+            // Backward-compatibility path: transparently migrate legacy plaintext passwords to BCrypt.
+            log.warn("Legacy password format detected for email={}. Attempting one-time migration.", maskEmail(user.getEmail()));
+            passwordMatches = password.equals(storedPassword);
+
+            if (passwordMatches) {
+                user.setPassword(passwordEncoder.encode(password));
+                userRepository.save(user);
+                log.info("Legacy password migrated to BCrypt for email={}", maskEmail(user.getEmail()));
+            }
+        }
 
         log.info("Login password check for email={} => matched={}", maskEmail(user.getEmail()), passwordMatches);
 

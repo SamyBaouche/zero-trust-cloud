@@ -28,7 +28,9 @@ public class CorsConfig {
         configuration.setAllowedOriginPatterns(List.of(
                 "https://zerotrustcloud.xyz",
                 "https://www.zerotrustcloud.xyz",
-                "https://*.vercel.app"
+                "https://*.vercel.app",
+                "http://localhost:*",
+                "http://127.0.0.1:*"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

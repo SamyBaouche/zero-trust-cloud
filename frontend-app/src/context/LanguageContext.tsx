@@ -87,8 +87,9 @@ const translations: Record<Language, Record<string, string>> = {
     'register.subtitle': 'Launch your Zero Trust environment in seconds.',
     'register.required': 'Email and password are required.',
     'register.requiredExtended':
-      'Email, password, first name, last name, and date of birth are required.',
+      'Email, password, confirm password, first name, last name, and date of birth are required.',
     'register.passwordRule': 'Password must contain at least 8 characters.',
+    'register.passwordMismatch': 'Password and confirmation must match.',
     'register.emailInUse': 'Email is already in use. Try another email.',
     'register.success': 'Account created successfully. You can now log in.',
     'register.error': 'Registration failed. Try with another email.',
@@ -110,6 +111,8 @@ const translations: Record<Language, Record<string, string>> = {
     'register.departmentPlaceholder': 'SOC Toronto',
     'register.securityClearance': 'Security clearance',
     'register.passwordPlaceholder': 'Minimum 8 characters',
+    'register.confirmPassword': 'Confirm password',
+    'register.confirmPasswordPlaceholder': 'Retype your password',
     'register.haveAccount': 'Already registered?',
     'register.signIn': 'Sign in',
 
@@ -232,8 +235,9 @@ const translations: Record<Language, Record<string, string>> = {
     'register.subtitle': 'Lancez votre environnement Zero Trust en quelques secondes.',
     'register.required': 'Email et mot de passe sont requis.',
     'register.requiredExtended':
-      'Email, mot de passe, prenom, nom et date de naissance sont requis.',
+      'Email, mot de passe, confirmation du mot de passe, prenom, nom et date de naissance sont requis.',
     'register.passwordRule': 'Le mot de passe doit contenir au moins 8 caracteres.',
+    'register.passwordMismatch': 'Le mot de passe et sa confirmation doivent etre identiques.',
     'register.emailInUse': 'Cet email est deja utilise. Essayez-en un autre.',
     'register.success': 'Compte cree avec succes. Vous pouvez maintenant vous connecter.',
     'register.error': 'Inscription impossible. Essayez avec un autre email.',
@@ -255,6 +259,8 @@ const translations: Record<Language, Record<string, string>> = {
     'register.departmentPlaceholder': 'SOC Montreal',
     'register.securityClearance': 'Niveau de clearance',
     'register.passwordPlaceholder': 'Minimum 8 caracteres',
+    'register.confirmPassword': 'Confirmer le mot de passe',
+    'register.confirmPasswordPlaceholder': 'Retapez votre mot de passe',
     'register.haveAccount': 'Deja inscrit ?',
     'register.signIn': 'Se connecter',
 

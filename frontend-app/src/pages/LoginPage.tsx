@@ -1,7 +1,7 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import axios from 'axios'
+import { getLoginErrorMessage } from '../services/authError'
 
 /**
  * LoginPage lets a user authenticate and stores the JWT via AuthContext.
@@ -14,7 +14,9 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [email, setEmail] = useState('')
+  const prefillEmail = (location.state as { prefillEmail?: string } | null)?.prefillEmail ?? ''
+
+  const [email, setEmail] = useState(prefillEmail)
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -24,6 +26,12 @@ export default function LoginPage() {
 
   // Default redirect is the dashboard.
   const fromPath = (location.state as { from?: string } | null)?.from ?? '/dashboard'
+
+  useEffect(() => {
+    if (prefillEmail) {
+      setEmail(prefillEmail)
+    }
+  }, [prefillEmail])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -40,28 +48,8 @@ export default function LoginPage() {
       await login({ email, password })
       navigate(fromPath, { replace: true })
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        console.error('Login failed', {
-          status: err.response?.status,
-          data: err.response?.data,
-          url: err.config?.url,
-        })
-
-        // Try to extract a backend-provided error message.
-        const responseData = err.response?.data as
-          | string
-          | { message?: string; detail?: string; error?: string }
-          | undefined
-
-        const apiMessage =
-          typeof responseData === 'string'
-            ? responseData
-            : responseData?.message || responseData?.detail || responseData?.error
-        setError(apiMessage || 'Invalid login. Please check your credentials.')
-      } else {
-        console.error('Unexpected login error', err)
-        setError('Invalid login. Please check your credentials.')
-      }
+      console.warn('Login request failed', err)
+      setError(getLoginErrorMessage(err))
     } finally {
       setLoading(false)
     }

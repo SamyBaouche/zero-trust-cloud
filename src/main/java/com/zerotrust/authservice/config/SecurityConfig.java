@@ -16,6 +16,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Configures Spring Security for the authentication service.
+ * <p>
+ * Main responsibilities:
+ * - enable CORS and disable CSRF for stateless JWT APIs
+ * - expose public authentication and health endpoints
+ * - require authentication for all other routes
+ * - register JWT filter and password/authentication beans
+ */
 @Configuration
 public class SecurityConfig {
 
@@ -27,6 +36,13 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * Builds the HTTP security chain for API requests.
+     *
+     * @param http Spring Security HTTP builder
+     * @return configured security filter chain
+     * @throws Exception if security configuration fails
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -54,11 +70,21 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Provides the password encoder used for hashing and password checks.
+     *
+     * @return BCrypt password encoder instance
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Creates the DAO authentication provider bound to our user details service.
+     *
+     * @return configured authentication provider
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider =
@@ -69,6 +95,13 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Exposes the Spring authentication manager for components that need manual authentication.
+     *
+     * @param config Spring authentication configuration
+     * @return authentication manager
+     * @throws Exception if manager creation fails
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

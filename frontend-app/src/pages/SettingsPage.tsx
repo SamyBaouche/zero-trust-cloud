@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useLanguage, type Language } from '../context/LanguageContext'
-import { useTheme } from '../context/ThemeContext'
+import { useLanguage } from '../context/LanguageContext'
 import {
   deleteCurrentAccount,
   getCurrentUserProfile,
@@ -38,15 +37,12 @@ function toEditableProfile(profile: UserProfile): EditableProfile {
 /**
  * SettingsPage lets an authenticated user:
  * - edit and save their profile (/context/profile)
- * - change theme/language
- * - export profile as JSON
  * - delete their account (/context/account)
  */
 export default function SettingsPage() {
   const navigate = useNavigate()
   const { userEmail, logout } = useAuth()
-  const { language, setLanguage, t } = useLanguage()
-  const { theme, setTheme } = useTheme()
+  const { t } = useLanguage()
 
   const [profile, setProfile] = useState<EditableProfile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -183,23 +179,6 @@ export default function SettingsPage() {
     }
   }
 
-  const handleExportProfile = () => {
-    if (!profile) {
-      return
-    }
-    // Create a local JSON file download from in-memory data.
-    const blob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' })
-    const fileName = `profile-${(profile.email || 'user').replace(/[^a-zA-Z0-9._-]/g, '_')}.json`
-    const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = fileName
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
-    URL.revokeObjectURL(url)
-  }
-
   if (loading || !profile) {
     return (
       <section className="glass-card panel panel-wide">
@@ -330,36 +309,9 @@ export default function SettingsPage() {
           <button type="submit" className="primary-button" disabled={!canSave || saving}>
             {saving ? t('common.loading') : t('settings.profile.save')}
           </button>
-          <button type="button" className="ghost-button" onClick={handleExportProfile}>
-            {t('settings.profile.export')}
-          </button>
         </div>
       </form>
 
-      <section className="settings-block">
-        <h3>{t('settings.appearance.title')}</h3>
-        <div className="settings-actions">
-          <label htmlFor="settings-language">{t('settings.language')}</label>
-          <select
-            id="settings-language"
-            value={language}
-            onChange={(event) => setLanguage(event.target.value as Language)}
-          >
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-          </select>
-
-          <label htmlFor="settings-theme">{t('settings.theme')}</label>
-          <select
-            id="settings-theme"
-            value={theme}
-            onChange={(event) => setTheme(event.target.value === 'light' ? 'light' : 'dark')}
-          >
-            <option value="dark">{t('settings.theme.dark')}</option>
-            <option value="light">{t('settings.theme.light')}</option>
-          </select>
-        </div>
-      </section>
 
       <section className="settings-block settings-danger-zone">
         <h3>{t('settings.account.title')}</h3>

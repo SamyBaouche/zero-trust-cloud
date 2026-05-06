@@ -1,8 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
-import axios from 'axios'
+import { getRegisterErrorMessage } from '../services/authError'
 
 const SECURITY_CLEARANCE_OPTIONS = ['Public', 'Internal', 'Confidential', 'Secret'] as const
 
@@ -19,6 +19,7 @@ export default function RegisterPage() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
@@ -32,20 +33,6 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    // Small UX trick: this page is presented as a centered card; disabling scrolling feels cleaner.
-    const previousOverflow = document.body.style.overflow
-    const previousOverflowY = document.body.style.overflowY
-
-    document.body.style.overflow = 'hidden'
-    document.body.style.overflowY = 'hidden'
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-      document.body.style.overflowY = previousOverflowY
-    }
-  }, [])
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -54,13 +41,18 @@ export default function RegisterPage() {
     }
 
     // Required fields.
-    if (!email.trim() || !password.trim() || !firstName.trim() || !lastName.trim() || !dateOfBirth) {
+    if (!email.trim() || !password.trim() || !confirmPassword.trim() || !firstName.trim() || !lastName.trim() || !dateOfBirth) {
       setError(t('register.requiredExtended'))
       return
     }
 
     if (password.trim().length < 8) {
       setError(t('register.passwordRule'))
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError(t('register.passwordMismatch'))
       return
     }
 
@@ -85,6 +77,7 @@ export default function RegisterPage() {
       const successText = message || t('register.success')
       setEmail('')
       setPassword('')
+      setConfirmPassword('')
       setFirstName('')
       setLastName('')
       setDateOfBirth('')
@@ -98,25 +91,12 @@ export default function RegisterPage() {
         replace: true,
         state: {
           successMessage: successText,
+          prefillEmail: email.trim().toLowerCase(),
         },
       })
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const status = err.response?.status
-        const apiMessage =
-          typeof err.response?.data === 'string'
-            ? err.response.data
-            : (err.response?.data as { message?: string } | undefined)?.message
-
-        // Backend uses HTTP 409 when the email already exists.
-        if (status === 409) {
-          setError(t('register.emailInUse'))
-        } else {
-          setError(apiMessage || t('register.error'))
-        }
-      } else {
-        setError(t('register.error'))
-      }
+      console.warn('Register request failed', err)
+      setError(getRegisterErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -185,6 +165,17 @@ export default function RegisterPage() {
           </div>
 
           <div className="register-field">
+            <label htmlFor="register-confirm-password">{t('register.confirmPassword')}</label>
+            <input
+              id="register-confirm-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              placeholder={t('register.confirmPasswordPlaceholder')}
+            />
+          </div>
+
+          <div className="register-field">
             <label htmlFor="register-company">{t('register.company')}</label>
             <input
               id="register-company"
@@ -239,7 +230,7 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="register-field register-field-clearance">
+          <div className="register-field">
             <label htmlFor="register-clearance">{t('register.securityClearance')}</label>
             <select
               id="register-clearance"

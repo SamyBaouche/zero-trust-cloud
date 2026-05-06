@@ -1,160 +1,268 @@
-# 🔐 ZeroTrustCloud
+# Zero Trust Cloud
 
-**Security-first Zero Trust platform for cloud applications**
+Production-style fullstack security platform built around Zero Trust principles.
 
-ZeroTrustCloud is a full-stack cloud security platform that simulates **Zero Trust access control decisions** using contextual risk scoring, authentication, and security observability.
+Version: 1.0.0
 
----
+## Why this project stands out
 
-## 🚀 Overview
+Most student projects stop at simple auth.
+This one goes further and implements an end-to-end security flow:
 
-Most authentication systems stop at login.  
-ZeroTrustCloud goes further by implementing a **Zero Trust architecture**:
+- identity + contextual access verification
+- risk-based decisions (ALLOW / CHALLENGE / DENY)
+- security observability (logs, policies, risk insights)
+- profile-aware security context
+- real deployment mindset (Vercel + Render + PostgreSQL + Docker)
 
-- Identity-aware access control  
-- Risk-based decision engine  
-- Full observability (logs + alerts)  
-- Policy-driven authorization  
+## Demo video (placeholder)
 
----
+Add your final demo video link here:
 
-## ✨ Key Features
+`[DEMO_VIDEO_LINK_HERE]`
 
-🔑 Authentication  
-- JWT-based secure authentication  
-- User registration & login  
+Suggested format for the final demo:
 
-🧠 Zero Trust Engine  
-- Context-aware access decisions  
-- ALLOW / CHALLENGE / DENY logic  
-- Dynamic risk scoring  
+1. Landing page walkthrough
+2. Register + login flow
+3. Access check engine demonstration
+4. Dashboard metrics, logs, and policy filters
+5. Settings/profile update flow
+6. Architecture and deployment quick recap
 
-📊 Security Monitoring  
-- Audit logs  
-- Security alerts  
-- Active policy tracking  
+## Product scope - v1.0.0
 
-👤 User Context System  
-- Profile-based risk evaluation  
-- Editable user metadata  
+### Core features
 
-⚙️ System Architecture  
-- Dockerized backend  
-- PostgreSQL database  
-- Scalable AWS-ready design  
+- JWT authentication (register/login)
+- protected routes in frontend
+- access check engine with contextual fields (resource, action, IP, location, device)
+- risk score and decision response
+- audit logs dashboard
+- interactive risk insights and policy filtering
+- profile management endpoints and UI
+- account deletion with password confirmation
 
----
+### Tech stack
 
-## 🛠️ Tech Stack
+Backend:
 
-Backend  
-- Spring Boot  
-- Java  
-- JWT  
-- PostgreSQL  
+- Java 17
+- Spring Boot (Web MVC, Security, Data JPA)
+- PostgreSQL
+- JWT (jjwt)
+- Maven
 
-Frontend  
-- React  
-- TypeScript  
+Frontend:
 
-DevOps & Infrastructure  
-- Docker  
-- Vercel (Frontend deployment)  
-- Render (Backend deployment)  
-- AWS RDS (Database)  
+- React + TypeScript
+- Parcel
+- Axios
+- React Router
 
----
+Infra and deployment:
 
-## 🏗️ Architecture
+- Docker / Docker Compose
+- Vercel (frontend)
+- Render (backend)
+- AWS RDS PostgreSQL (production database)
 
-Frontend (Vercel)  
-↓  
-Backend API (Render / AWS)  
-↓  
-PostgreSQL (AWS RDS)  
+## Architecture
 
----
+```text
+Browser (React + Parcel)
+	|
+	| HTTPS
+	v
+Spring Boot API (JWT, CORS, Zero Trust engine)
+	|
+	| JDBC
+	v
+PostgreSQL (local Docker / AWS RDS in prod)
+```
 
-## 📸 Demo & Screenshots
+## Repository structure
 
-👉 Add your demo links/screenshots here:
+```text
+.
+|- src/main/java                # Spring Boot backend
+|- src/main/resources           # application properties + SQL migrations
+|- frontend-app/src             # React frontend
+|- docker-compose.yml           # local PostgreSQL + optional backend container
+|- Dockerfile                   # backend image build
+|- postman/                     # API collection examples
+```
 
-- 🏠 Landing Page: ADD_LINK_HERE  
-- 🔐 Login Page: ADD_LINK_HERE  
-- 📝 Register Page: ADD_LINK_HERE  
-- 📊 Dashboard: ADD_LINK_HERE  
-- ⚡ Access Check: ADD_LINK_HERE  
-- 📜 Logs Page: ADD_LINK_HERE  
-- 🚨 Alerts Page: ADD_LINK_HERE  
-- 🛡️ Policies Page: ADD_LINK_HERE  
+## Local development setup
 
----
+### 1) Start PostgreSQL with Docker
 
-## ⚙️ Run Locally
+```powershell
+Set-Location "C:\Stages\Zero_Trust_Cloud"
+docker compose up -d postgres
+```
 
-Backend  
-./mvnw spring-boot:run  
+PostgreSQL local mapping in this project:
 
-Frontend  
-cd frontend-app  
-npm install  
-npm run dev  
+- host: `localhost`
+- port: `5433`
+- db: `zero_trust_cloud`
+- user: `postgres`
 
-Docker  
-docker compose up --build  
+### 2) Start backend locally
 
----
+```powershell
+Set-Location "C:\Stages\Zero_Trust_Cloud"
+$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5433/zero_trust_cloud"
+$env:SPRING_DATASOURCE_USERNAME="postgres"
+$env:SPRING_DATASOURCE_PASSWORD="postgres"
+$env:PORT="5000"
+.\mvnw.cmd spring-boot:run
+```
 
-## 🔌 API Endpoints
+### 3) Start frontend locally
 
-POST /auth/register  
-POST /auth/login  
-POST /access/check  
-GET /logs  
-GET /alerts  
-GET /policies  
-GET /context/profile  
-PUT /context/profile  
-DELETE /context/account  
-GET /health  
+```powershell
+Set-Location "C:\Stages\Zero_Trust_Cloud\frontend-app"
+npm install
+npm run dev
+```
 
----
+Note:
 
-## ☁️ Deployment
+- local frontend should target local backend during dev (`http://localhost:5000`)
+- production frontend should target Render backend
 
-Frontend: Vercel  
-Backend: Render / AWS (EC2 / ECS)  
-Database: AWS RDS (PostgreSQL)  
-Logs: CloudWatch (planned)  
-Secrets: AWS Secrets Manager (planned)  
+## Docker usage in this project
 
----
+Docker is used to standardize local DB setup and reduce environment drift.
 
-## 🔮 Future Updates
+Main practical benefits:
 
-📧 Email verification system (end-to-end)  
-🌙 Light / Dark mode toggle  
-🌍 Multi-language support (EN / FR)  
-🔐 Multi-factor authentication (MFA / 2FA)  
-🤖 ML-based anomaly detection  
-⚡ CI/CD pipeline  
-☁️ Full AWS production deployment  
-📊 Advanced dashboard analytics  
-🛠️ Additional platform features  
-🐛 Bug fixes and performance improvements  
+- same DB baseline for every machine
+- faster onboarding
+- reproducible local debugging
 
----
+Useful commands:
 
-## 🧪 Development Checks
+```powershell
+docker compose up -d postgres
+docker compose ps
+docker compose logs -f postgres
+docker compose down
+```
 
-./mvnw -q test  
-cd frontend-app && npm run build  
+## API endpoints (v1)
 
----
+Auth:
 
-## 👨‍💻 Author
+- `POST /auth/register`
+- `POST /auth/login`
 
-Samy Baouche  
+Access and observability:
 
-GitHub: ADD_GITHUB_LINK  
-LinkedIn: ADD_LINKEDIN_LINK  
+- `POST /access/check`
+- `GET /access/scenarios`
+- `POST /access/simulate/{scenarioId}`
+- `GET /logs`
+- `GET /alerts`
+- `GET /policies`
+
+Context and profile:
+
+- `GET /context/me`
+- `GET /context/profile`
+- `PUT /context/profile`
+- `DELETE /context/account`
+
+Health:
+
+- `GET /health`
+
+## Terminal commands used during the project
+
+Backend:
+
+```powershell
+.\mvnw.cmd -DskipTests compile
+.\mvnw.cmd spring-boot:run
+.\mvnw.cmd test
+```
+
+Frontend:
+
+```powershell
+npm run dev
+npm run typecheck
+npm run lint
+npm run build
+```
+
+Docker:
+
+```powershell
+docker compose up -d postgres
+docker compose down
+```
+
+Git:
+
+```powershell
+git add .
+git commit -m "feat: ..."
+git push
+```
+
+## Deployment notes
+
+Current deployment model:
+
+- frontend on Vercel
+- backend on Render
+- PostgreSQL on AWS RDS
+
+Critical production checks:
+
+- correct `VITE_API_URL`
+- CORS allowed origins aligned with real domains
+- DB env variables correctly set on backend service
+- health endpoint returns database UP
+
+## Future updates roadmap
+
+### UX and product
+
+- light/dark mode polishing and full theme parity
+- improved language switch and complete EN/FR coverage
+- richer dashboard widgets and investigation timeline
+- notifications center and user-defined security thresholds
+
+### Security
+
+- MFA / 2FA
+- refresh token rotation and session management
+- stronger anomaly detection and behavior baselines
+- admin RBAC and audit exports
+
+### DevOps / Cloud
+
+- Terraform infrastructure as code
+- AWS CloudFront in front of frontend
+- backend containerization flow for AWS ECS/Fargate
+- CI/CD with automated tests + security checks
+- central logging and monitoring (CloudWatch / OpenTelemetry)
+
+## Recruiter-friendly highlights
+
+- End-to-end fullstack ownership (backend, frontend, infra)
+- Security-focused product thinking (not just CRUD)
+- Production debugging experience (CORS, auth, env, deployment)
+- Clean code documentation (JSDoc/Javadoc pass)
+- Realistic roadmap from v1.0.0 to cloud-scale architecture
+
+## Author
+
+Samy Baouche
+
+- GitHub: `[ADD_GITHUB_LINK]`
+- LinkedIn: `[ADD_LINKEDIN_LINK]`

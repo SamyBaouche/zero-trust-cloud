@@ -6,8 +6,16 @@ import { getToken, removeToken } from './storage'
  * <p>
  * Defined through Vite environment variables.
  */
-const API_URL =
-  import.meta.env?.VITE_API_URL || 'https://zero-trust-cloud.onrender.com'
+const envApiUrl =
+  import.meta.env?.VITE_API_URL ||
+  (typeof process !== 'undefined' ? process.env?.VITE_API_URL : undefined)
+
+const isLocalFrontend =
+  typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)
+
+const API_URL = isLocalFrontend
+  ? (envApiUrl && /localhost|127\.0\.0\.1/.test(envApiUrl) ? envApiUrl : 'http://localhost:5000')
+  : envApiUrl || 'https://zero-trust-cloud.onrender.com'
 
 /**
  * Shared Axios instance used by all frontend services.

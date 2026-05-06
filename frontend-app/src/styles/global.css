@@ -266,7 +266,7 @@ button {
 
 .landing-steps {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -534,8 +534,8 @@ button {
 
 .register-card {
   width: 100%;
-  max-width: 900px;
-  margin-top: -30px;
+  max-width: 960px;
+  margin-top: 0;
 }
 
 .register-form-grid {
@@ -551,9 +551,9 @@ button {
 }
 
 .register-field-clearance {
-  grid-column: 1 / -1;
-  width: min(360px, 100%);
-  justify-self: center;
+  grid-column: auto;
+  width: 100%;
+  justify-self: stretch;
 }
 
 .register-field input,
@@ -610,6 +610,22 @@ select:focus {
 .settings-form select:focus,
 .settings-block input:focus,
 .settings-block select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.policy-filters input,
+.policy-filters select {
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 0.85rem;
+}
+
+.policy-filters input:focus,
+.policy-filters select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
@@ -918,6 +934,62 @@ html[data-theme='light'] .sidebar-footer .danger-button:hover {
   background: var(--bg-secondary);
   display: grid;
   gap: 0.5rem;
+}
+
+.alerts-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.alert-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.alert-card:hover,
+.alert-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.alert-high_risk,
+.alert-deny {
+  border-left: 4px solid var(--danger);
+}
+
+.alert-medium_risk,
+.alert-challenge {
+  border-left: 4px solid var(--warning);
+}
+
+.alert-low_risk,
+.alert-allow {
+  border-left: 4px solid var(--accent);
+}
+
+.policies-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.policies-table th,
+.policies-table td {
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.55rem;
+  text-align: left;
+}
+
+.policies-table th {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .decision-badge {

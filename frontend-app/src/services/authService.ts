@@ -31,7 +31,12 @@ export async function loginRequest(payload: LoginRequest): Promise<AuthResponse>
  * @returns a plain success message string
  */
 export async function registerRequest(payload: RegisterRequest): Promise<string> {
-  const { data } = await apiClient.post<string>('auth/register', payload)
+  const requestBody: RegisterRequest = {
+    ...payload,
+    email: payload.email.trim().toLowerCase(),
+  }
+
+  const { data } = await apiClient.post<string>('auth/register', requestBody)
   return data
 }
 
