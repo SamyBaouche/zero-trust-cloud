@@ -4,14 +4,20 @@ Production-style fullstack security platform built around Zero Trust principles.
 
 **Version:** `1.0.0`
 
+This project is designed as a recruiter-facing engineering portfolio: not just a login app, but a realistic security-focused system that combines backend architecture, frontend product thinking, Dockerized development, and production deployment constraints (CORS, env vars, health checks, and cloud readiness).
+
 ---
 
 ## 📚 Table of Contents
 
+- [⚡ Quick Overview](#-quick-overview)
 - [🌟 Why This Project Stands Out](#-why-this-project-stands-out)
+- [🔗 Live Demo](#-live-demo)
 - [🎬 Demo Video (Placeholder)](#-demo-video-placeholder)
+- [🖼️ Screenshots (Placeholders)](#️-screenshots-placeholders)
 - [🚀 Product Scope - v1.0.0](#-product-scope---v100)
 - [🧰 Tech Stack](#-tech-stack)
+- [🛡️ Security Design Principles](#️-security-design-principles)
 - [🏗️ Architecture](#️-architecture)
 - [🗂️ Repository Structure](#️-repository-structure)
 - [💻 Local Development Setup](#-local-development-setup)
@@ -19,9 +25,19 @@ Production-style fullstack security platform built around Zero Trust principles.
 - [🔌 API Endpoints (v1)](#-api-endpoints-v1)
 - [🖥️ Terminal Commands Used During the Project](#️-terminal-commands-used-during-the-project)
 - [☁️ Deployment Notes](#️-deployment-notes)
+- [🧩 Technical Challenges Solved](#-technical-challenges-solved)
+- [💼 Why This Project Matters](#-why-this-project-matters)
 - [🛣️ Future Updates Roadmap](#️-future-updates-roadmap)
 - [🎯 Recruiter-Friendly Highlights](#-recruiter-friendly-highlights)
 - [👨‍💻 Author](#-author)
+
+---
+
+## ⚡ Quick Overview
+
+- **Problem:** classic auth-only apps do not model real-world access risk.
+- **Approach:** evaluate contextual access requests and return `ALLOW`, `CHALLENGE`, or `DENY`.
+- **Result:** a fullstack Zero Trust workflow with security visibility, profile context, and production deployment discipline.
 
 ---
 
@@ -35,6 +51,14 @@ This project goes further with a practical end-to-end security flow:
 - ✅ security observability (logs, policies, risk insights)
 - ✅ profile-aware security context
 - ✅ deployment mindset (`Vercel + Render + PostgreSQL + Docker`)
+
+---
+
+## 🔗 Live Demo
+
+- **Frontend (Vercel):** `[LIVE_FRONTEND_URL_HERE]`
+- **Backend Health (Render):** `[LIVE_BACKEND_HEALTH_URL_HERE]`
+- **API Base URL:** `[LIVE_API_BASE_URL_HERE]`
 
 ---
 
@@ -65,6 +89,16 @@ Add your demo videos here (you only need to replace each placeholder link).
 ### ⚙️ Settings
 
 `[DEMO_SETTINGS_VIDEO_LINK]`
+
+---
+
+## 🖼️ Screenshots (Placeholders)
+
+- Dashboard: `[SCREENSHOT_DASHBOARD_LINK]`
+- Audit Logs: `[SCREENSHOT_AUDIT_LOGS_LINK]`
+- Login Page: `[SCREENSHOT_LOGIN_LINK]`
+- Attack Simulator: `[SCREENSHOT_ATTACK_SIMULATOR_LINK]`
+- Settings Page: `[SCREENSHOT_SETTINGS_LINK]`
 
 ---
 
@@ -109,7 +143,21 @@ Add your demo videos here (you only need to replace each placeholder link).
 
 ---
 
+## 🛡️ Security Design Principles
+
+- **Stateless JWT authentication:** each protected request is verified without server session state.
+- **BCrypt password hashing:** passwords are never stored in plaintext.
+- **Context-aware authorization:** access decisions consider action, resource, IP, location, and device context.
+- **Least privilege mindset:** protected routes are gated and public endpoints are explicitly scoped.
+- **Audit logging:** access decisions are persisted for traceability and review.
+- **Separation of concerns:** controllers, services, repositories, DTOs, and frontend services are clearly separated.
+- **Risk-based decisions:** deterministic decision model (`ALLOW / CHALLENGE / DENY`) tied to risk scoring.
+
+---
+
 ## 🏗️ Architecture
+
+Current request flow:
 
 ```text
 Browser (React + Parcel)
@@ -121,6 +169,17 @@ Spring Boot API (JWT, CORS, Zero Trust engine)
     | JDBC
     v
 PostgreSQL (local Docker / AWS RDS in production)
+```
+
+Mermaid view:
+
+```mermaid
+flowchart TD
+    A[React + TypeScript Frontend\nVercel / Local] -->|HTTPS REST| B[Spring Boot API\nRender / Local]
+    B -->|JWT validation| C[Spring Security Layer]
+    B -->|JPA / JDBC| D[(PostgreSQL)]
+    D -->|Managed in prod| E[AWS RDS]
+    B --> F[Health Endpoint\n/health]
 ```
 
 ---
@@ -275,12 +334,55 @@ Current deployment model:
 - backend on Render
 - PostgreSQL on AWS RDS
 
+Deployment architecture is intentionally split by responsibility:
+
+- **Frontend (Vercel):** static app delivery and client-side routing
+- **Backend (Render):** API runtime, auth logic, and risk engine
+- **Database (AWS RDS):** durable managed PostgreSQL data layer
+
+Environment variable strategy:
+
+- frontend uses `VITE_API_URL`
+- backend uses `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, and JWT secret config
+
+CORS and domain alignment:
+
+- allowed origins are explicitly configured for production domains and local development
+- credentials + preflight behavior are handled to avoid browser-side auth failures
+
+Health and production checks:
+
+- `GET /health` verifies service and database availability
+- deployment validation includes API URL consistency, CORS headers, and database connectivity
+
 Critical production checks:
 
 - correct `VITE_API_URL`
 - CORS allowed origins aligned with real domains
 - DB env variables correctly set on backend service
 - health endpoint returns database `UP`
+
+---
+
+## 🧩 Technical Challenges Solved
+
+- **CORS in production:** aligned allowed origins between Vercel domains and backend API.
+- **Frontend/backend URL drift:** stabilized API base URL strategy for local and production contexts.
+- **Auth payload consistency:** aligned frontend payload contracts with backend DTO expectations.
+- **Password compatibility:** handled credential validation with secure hashing flow.
+- **SPA refresh routing on Vercel:** configured rewrite behavior to avoid route 404 on refresh.
+- **Local reproducibility:** used Dockerized PostgreSQL to reduce environment differences.
+
+---
+
+## 💼 Why This Project Matters
+
+For internship recruiters, this project demonstrates practical engineering maturity:
+
+- ability to design beyond CRUD into security decisioning workflows
+- understanding of production constraints (network, CORS, env vars, deployment boundaries)
+- fullstack ownership from UI to API to database and operations
+- clear documentation and maintainable code organization
 
 ---
 
@@ -307,6 +409,14 @@ Critical production checks:
 - backend containerization flow for AWS ECS/Fargate
 - CI/CD with automated tests + security checks
 - centralized logging and monitoring (CloudWatch / OpenTelemetry)
+
+### 📈 Scalability & Cloud Vision
+
+- move toward immutable infrastructure and environment promotion workflows
+- support horizontal API scaling behind load balancing
+- improve observability with traces/metrics/log correlation
+- introduce cache and async processing patterns for heavier workloads
+- evolve deployment pipeline to support zero-downtime rollout strategies
 
 ---
 
