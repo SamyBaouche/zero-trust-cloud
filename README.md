@@ -1,87 +1,118 @@
-# Zero Trust Cloud
+# 🔐 Zero Trust Cloud
 
 Production-style fullstack security platform built around Zero Trust principles.
 
-Version: 1.0.0
+**Version:** `1.0.0`
 
-## Why this project stands out
+---
 
-Most student projects stop at simple auth.
-This one goes further and implements an end-to-end security flow:
+## 📚 Table of Contents
 
-- identity + contextual access verification
-- risk-based decisions (ALLOW / CHALLENGE / DENY)
-- security observability (logs, policies, risk insights)
-- profile-aware security context
-- real deployment mindset (Vercel + Render + PostgreSQL + Docker)
+- [🌟 Why This Project Stands Out](#-why-this-project-stands-out)
+- [🎬 Demo Video (Placeholder)](#-demo-video-placeholder)
+- [🚀 Product Scope - v1.0.0](#-product-scope---v100)
+- [🧰 Tech Stack](#-tech-stack)
+- [🏗️ Architecture](#️-architecture)
+- [🗂️ Repository Structure](#️-repository-structure)
+- [💻 Local Development Setup](#-local-development-setup)
+- [🐳 Docker Usage](#-docker-usage)
+- [🔌 API Endpoints (v1)](#-api-endpoints-v1)
+- [🖥️ Terminal Commands Used During the Project](#️-terminal-commands-used-during-the-project)
+- [☁️ Deployment Notes](#️-deployment-notes)
+- [🛣️ Future Updates Roadmap](#️-future-updates-roadmap)
+- [🎯 Recruiter-Friendly Highlights](#-recruiter-friendly-highlights)
+- [👨‍💻 Author](#-author)
 
-## Demo video (placeholder)
+---
+
+## 🌟 Why This Project Stands Out
+
+Most student projects stop at simple authentication.
+This project goes further with a practical end-to-end security flow:
+
+- ✅ identity + contextual access verification
+- ✅ risk-based decisions (`ALLOW / CHALLENGE / DENY`)
+- ✅ security observability (logs, policies, risk insights)
+- ✅ profile-aware security context
+- ✅ deployment mindset (`Vercel + Render + PostgreSQL + Docker`)
+
+---
+
+## 🎬 Demo Video (Placeholder)
 
 Add your final demo video link here:
 
 `[DEMO_VIDEO_LINK_HERE]`
 
-Suggested format for the final demo:
+Suggested structure for your demo:
 
 1. Landing page walkthrough
 2. Register + login flow
 3. Access check engine demonstration
 4. Dashboard metrics, logs, and policy filters
 5. Settings/profile update flow
-6. Architecture and deployment quick recap
+6. Architecture and deployment recap
 
-## Product scope - v1.0.0
+---
 
-### Core features
+## 🚀 Product Scope - v1.0.0
 
-- JWT authentication (register/login)
-- protected routes in frontend
-- access check engine with contextual fields (resource, action, IP, location, device)
-- risk score and decision response
-- audit logs dashboard
-- interactive risk insights and policy filtering
-- profile management endpoints and UI
-- account deletion with password confirmation
+### Core Features
 
-### Tech stack
+- JWT authentication (`register/login`)
+- Protected routes in frontend
+- Access check engine with contextual fields (resource, action, IP, location, device)
+- Risk score + decision response
+- Audit logs dashboard
+- Interactive risk insights and policy filtering
+- Profile management endpoints and UI
+- Account deletion with password confirmation
 
-Backend:
+---
+
+## 🧰 Tech Stack
+
+### Backend
 
 - Java 17
-- Spring Boot (Web MVC, Security, Data JPA)
+- Spring Boot (`Web MVC`, `Security`, `Data JPA`)
 - PostgreSQL
-- JWT (jjwt)
+- JWT (`jjwt`)
 - Maven
 
-Frontend:
+### Frontend
 
 - React + TypeScript
 - Parcel
 - Axios
 - React Router
 
-Infra and deployment:
+### Infra & Deployment
 
 - Docker / Docker Compose
 - Vercel (frontend)
 - Render (backend)
 - AWS RDS PostgreSQL (production database)
 
-## Architecture
+---
+
+## 🏗️ Architecture
 
 ```text
 Browser (React + Parcel)
-	|
-	| HTTPS
-	v
+    |
+    | HTTPS
+    v
 Spring Boot API (JWT, CORS, Zero Trust engine)
-	|
-	| JDBC
-	v
-PostgreSQL (local Docker / AWS RDS in prod)
+    |
+    | JDBC
+    v
+PostgreSQL (local Docker / AWS RDS in production)
 ```
 
-## Repository structure
+---
+
+## 🗂️ Repository Structure
 
 ```text
 .
@@ -93,7 +124,9 @@ PostgreSQL (local Docker / AWS RDS in prod)
 |- postman/                     # API collection examples
 ```
 
-## Local development setup
+---
+
+## 💻 Local Development Setup
 
 ### 1) Start PostgreSQL with Docker
 
@@ -102,7 +135,7 @@ Set-Location "C:\Stages\Zero_Trust_Cloud"
 docker compose up -d postgres
 ```
 
-PostgreSQL local mapping in this project:
+PostgreSQL local mapping:
 
 - host: `localhost`
 - port: `5433`
@@ -128,16 +161,18 @@ npm install
 npm run dev
 ```
 
-Note:
+Notes:
 
-- local frontend should target local backend during dev (`http://localhost:5000`)
+- local frontend should target local backend (`http://localhost:5000`)
 - production frontend should target Render backend
 
-## Docker usage in this project
+---
 
-Docker is used to standardize local DB setup and reduce environment drift.
+## 🐳 Docker Usage
 
-Main practical benefits:
+Docker is used to standardize local database setup and reduce environment drift.
+
+Benefits:
 
 - same DB baseline for every machine
 - faster onboarding
@@ -152,14 +187,16 @@ docker compose logs -f postgres
 docker compose down
 ```
 
-## API endpoints (v1)
+---
 
-Auth:
+## 🔌 API Endpoints (v1)
+
+### Auth
 
 - `POST /auth/register`
 - `POST /auth/login`
 
-Access and observability:
+### Access & Observability
 
 - `POST /access/check`
 - `GET /access/scenarios`
@@ -168,20 +205,22 @@ Access and observability:
 - `GET /alerts`
 - `GET /policies`
 
-Context and profile:
+### Context & Profile
 
 - `GET /context/me`
 - `GET /context/profile`
 - `PUT /context/profile`
 - `DELETE /context/account`
 
-Health:
+### Health
 
 - `GET /health`
 
-## Terminal commands used during the project
+---
 
-Backend:
+## 🖥️ Terminal Commands Used During the Project
+
+### Backend
 
 ```powershell
 .\mvnw.cmd -DskipTests compile
@@ -189,7 +228,7 @@ Backend:
 .\mvnw.cmd test
 ```
 
-Frontend:
+### Frontend
 
 ```powershell
 npm run dev
@@ -198,14 +237,14 @@ npm run lint
 npm run build
 ```
 
-Docker:
+### Docker
 
 ```powershell
 docker compose up -d postgres
 docker compose down
 ```
 
-Git:
+### Git
 
 ```powershell
 git add .
@@ -213,7 +252,9 @@ git commit -m "feat: ..."
 git push
 ```
 
-## Deployment notes
+---
+
+## ☁️ Deployment Notes
 
 Current deployment model:
 
@@ -226,41 +267,47 @@ Critical production checks:
 - correct `VITE_API_URL`
 - CORS allowed origins aligned with real domains
 - DB env variables correctly set on backend service
-- health endpoint returns database UP
+- health endpoint returns database `UP`
 
-## Future updates roadmap
+---
 
-### UX and product
+## 🛣️ Future Updates Roadmap
 
-- light/dark mode polishing and full theme parity
+### 🎨 UX & Product
+
+- dark/light mode polishing and full theme parity
 - improved language switch and complete EN/FR coverage
 - richer dashboard widgets and investigation timeline
-- notifications center and user-defined security thresholds
+- notification center and user-defined security thresholds
 
-### Security
+### 🛡️ Security
 
 - MFA / 2FA
 - refresh token rotation and session management
 - stronger anomaly detection and behavior baselines
 - admin RBAC and audit exports
 
-### DevOps / Cloud
+### ☁️ DevOps / Cloud
 
 - Terraform infrastructure as code
 - AWS CloudFront in front of frontend
 - backend containerization flow for AWS ECS/Fargate
 - CI/CD with automated tests + security checks
-- central logging and monitoring (CloudWatch / OpenTelemetry)
+- centralized logging and monitoring (CloudWatch / OpenTelemetry)
 
-## Recruiter-friendly highlights
+---
+
+## 🎯 Recruiter-Friendly Highlights
 
 - End-to-end fullstack ownership (backend, frontend, infra)
 - Security-focused product thinking (not just CRUD)
 - Production debugging experience (CORS, auth, env, deployment)
-- Clean code documentation (JSDoc/Javadoc pass)
-- Realistic roadmap from v1.0.0 to cloud-scale architecture
+- Clean code documentation (`JSDoc` + `Javadoc`)
+- Realistic roadmap from `v1.0.0` to cloud-scale architecture
 
-## Author
+---
+
+## 👨‍💻 Author
 
 Samy Baouche
 
