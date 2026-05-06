@@ -40,18 +40,31 @@ This project goes further with a practical end-to-end security flow:
 
 ## 🎬 Demo Video (Placeholder)
 
-Add your final demo video link here:
+Add your demo videos here (you only need to replace each placeholder link).
 
-`[DEMO_VIDEO_LINK_HERE]`
+### 🏠 Home Page
 
-Suggested structure for your demo:
+`[DEMO_HOME_PAGE_VIDEO_LINK]`
 
-1. Landing page walkthrough
-2. Register + login flow
-3. Access check engine demonstration
-4. Dashboard metrics, logs, and policy filters
-5. Settings/profile update flow
-6. Architecture and deployment recap
+### 🔐 Register / Login
+
+`[DEMO_REGISTER_LOGIN_VIDEO_LINK]`
+
+### 📊 Dashboard
+
+`[DEMO_DASHBOARD_VIDEO_LINK]`
+
+### 📜 Audit Logs
+
+`[DEMO_AUDIT_LOGS_VIDEO_LINK]`
+
+### ⚔️ Attack Simulator
+
+`[DEMO_ATTACK_SIMULATOR_VIDEO_LINK]`
+
+### ⚙️ Settings
+
+`[DEMO_SETTINGS_VIDEO_LINK]`
 
 ---
 
